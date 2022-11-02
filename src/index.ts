@@ -53,7 +53,7 @@ try {
   const projectName = getInput("projectName", { required: true });
   const directory = getInput("directory", { required: true });
   const gitHubToken = getInput("gitHubToken", { required: true });
-  const branch = getInput("branch", { required: false });
+  const branch = getInput("branch", { required: true });
 
   const octokit = getOctokit(gitHubToken);
 
@@ -126,19 +126,16 @@ try {
 
     setOutput("id", pagesDeployment.id);
     setOutput("url", pagesDeployment.url);
-    setOutput("environment", pagesDeployment.environment);
+    setOutput("environment", branch);
 
     const url = new URL(pagesDeployment.url);
-    const productionEnvironment = pagesDeployment.environment === "production";
-    const environmentName = productionEnvironment
-      ? "Production"
-      : `Preview (${url.host.split(".")[0]})`;
+    const productionEnvironment = branch === "prod";
 
     if (gitHubDeployment) {
       await createGitHubDeploymentStatus({
         id: gitHubDeployment.id,
         url: pagesDeployment.url,
-        environmentName,
+        branch,
         productionEnvironment,
       });
     }
