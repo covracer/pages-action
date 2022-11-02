@@ -16115,7 +16115,7 @@ try {
   const projectName = (0, import_core.getInput)("projectName", { required: true });
   const directory = (0, import_core.getInput)("directory", { required: true });
   const gitHubToken = (0, import_core.getInput)("gitHubToken", { required: true });
-  const branch = (0, import_core.getInput)("branch", { required: false });
+  const branch = (0, import_core.getInput)("branch", { required: true });
   const octokit = (0, import_github.getOctokit)(gitHubToken);
   const createPagesDeployment = async () => {
     await esm_default`
@@ -16124,7 +16124,7 @@ try {
       $ export CLOUDFLARE_ACCOUNT_ID="${accountId}"
     }
   
-    $$ npx wrangler@2 pages publish "${directory}" --project-name="${projectName}" --branch="${branch}"
+    $$ npx -c wrangler@2 pages publish "${directory}" --project-name="${projectName}" --branch="${branch}"
     `;
     const response = await (0, import_undici.fetch)(`https://api.cloudflare.com/client/v4/accounts/${accountId}/pages/projects/${projectName}/deployments`, { headers: { Authorization: `Bearer ${apiToken}` } });
     const {
@@ -16168,15 +16168,14 @@ try {
     const pagesDeployment = await createPagesDeployment();
     (0, import_core.setOutput)("id", pagesDeployment.id);
     (0, import_core.setOutput)("url", pagesDeployment.url);
-    (0, import_core.setOutput)("environment", pagesDeployment.environment);
+    (0, import_core.setOutput)("environment", branch);
     const url = new URL(pagesDeployment.url);
-    const productionEnvironment = pagesDeployment.environment === "production";
-    const environmentName = productionEnvironment ? "Production" : `Preview (${url.host.split(".")[0]})`;
+    const productionEnvironment = branch === "prod";
     if (gitHubDeployment) {
       await createGitHubDeploymentStatus({
         id: gitHubDeployment.id,
         url: pagesDeployment.url,
-        environmentName,
+        branch,
         productionEnvironment
       });
     }
