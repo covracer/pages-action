@@ -125,14 +125,12 @@ try {
 
     const pagesDeployment = await createPagesDeployment();
 
-    const url = custom_domain.replace("${branch}", branch);
-
     const productionEnvironment = branch === "prod";
 
     if (gitHubDeployment) {
       await createGitHubDeploymentStatus({
         id: gitHubDeployment.id,
-        url,
+        url: custom_domain,
         environmentName: branch,
         productionEnvironment,
       });
