@@ -65,7 +65,7 @@ try {
       $ export CLOUDFLARE_ACCOUNT_ID="${accountId}"
     }
   
-    $$ npx -c wrangler@2 pages publish "${directory}" --project-name="${projectName}" --branch="${branch}"
+    $$ npx -c 'wrangler@2 pages publish "${directory}" --project-name="${projectName}" --branch="${branch}"'
     `;
 
     const response = await fetch(
@@ -135,7 +135,7 @@ try {
       await createGitHubDeploymentStatus({
         id: gitHubDeployment.id,
         url: pagesDeployment.url,
-        branch,
+        environmentName: branch,
         productionEnvironment,
       });
     }
