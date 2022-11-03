@@ -21,7 +21,10 @@ inputs:
     required: true
   branch:
     description: "The name of the branch you want to deploy to"
-    required: false
+    required: true
+  customDomain:
+    description: "Where 'View deployment' will link"
+    required: true
 runs:
   using: "node16"
   main: "index.js"
