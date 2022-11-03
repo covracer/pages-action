@@ -16116,6 +16116,7 @@ try {
   const directory = (0, import_core.getInput)("directory", { required: true });
   const gitHubToken = (0, import_core.getInput)("gitHubToken", { required: true });
   const branch = (0, import_core.getInput)("branch", { required: true });
+  const custom_domain = (0, import_core.getInput)("customDomain", { required: true });
   const octokit = (0, import_github.getOctokit)(gitHubToken);
   const createPagesDeployment = async () => {
     await esm_default`
@@ -16166,15 +16167,12 @@ try {
   (async () => {
     const gitHubDeployment = await createGitHubDeployment();
     const pagesDeployment = await createPagesDeployment();
-    (0, import_core.setOutput)("id", pagesDeployment.id);
-    (0, import_core.setOutput)("url", pagesDeployment.url);
-    (0, import_core.setOutput)("environment", branch);
-    const url = new URL(pagesDeployment.url);
+    const url = custom_domain.replace("${branch}", branch);
     const productionEnvironment = branch === "prod";
     if (gitHubDeployment) {
       await createGitHubDeploymentStatus({
         id: gitHubDeployment.id,
-        url: pagesDeployment.url,
+        url,
         environmentName: branch,
         productionEnvironment
       });

@@ -54,6 +54,7 @@ try {
   const directory = getInput("directory", { required: true });
   const gitHubToken = getInput("gitHubToken", { required: true });
   const branch = getInput("branch", { required: true });
+  const custom_domain = getInput("customDomain", { required: true });
 
   const octokit = getOctokit(gitHubToken);
 
@@ -124,17 +125,14 @@ try {
 
     const pagesDeployment = await createPagesDeployment();
 
-    setOutput("id", pagesDeployment.id);
-    setOutput("url", pagesDeployment.url);
-    setOutput("environment", branch);
+    const url = custom_domain.replace("${branch}", branch);
 
-    const url = new URL(pagesDeployment.url);
     const productionEnvironment = branch === "prod";
 
     if (gitHubDeployment) {
       await createGitHubDeploymentStatus({
         id: gitHubDeployment.id,
-        url: pagesDeployment.url,
+        url,
         environmentName: branch,
         productionEnvironment,
       });
